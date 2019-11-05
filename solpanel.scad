@@ -1,5 +1,5 @@
 // Angle of the plate holding the solar cell
-angle=45; // [90]
+angle=45; // [0:0.1:90]
 // Height
 height=100;
 // Width
@@ -25,15 +25,17 @@ module for_vertical_print_internal() {
   }
 }
 
-module text_for_3dprint(t) {
+module text_for_3dprint(t, size_rel=1) {
   for_vertical_print_internal() {
     rotate([90, 0, 180])
       linear_extrude(height=text_depth, convexity=10)
-        text(t, halign="center", valign="center", size=10/50*height);
+        text(t, halign="center", valign="center", size=10/50*height*size_rel);
   }
 }
 
 module holder() {
+  size_determinant = (angle > 45 ? pow(cos(angle), 2.5) : sin(angle));
+  size_rel = sqrt(sqrt(2)*size_determinant);
   difference() {
     rotate([angle, 0, 0]) {
       translate([0, 0, -100])
@@ -50,9 +52,9 @@ module holder() {
     }
     translate([-1, 0, height*sin(angle)])
       cube([500, 500, 50]);
-    translate([width-text_depth+0.01, height*cos(angle)/1.5, height*sin(angle)/3])
+    translate([width-text_depth+0.01, height*cos(angle)/1.4, height*sin(angle)/3.2])
       rotate([0, 0, -90])
-        text_for_3dprint(str(angle, "°"));
+        text_for_3dprint(str(angle, "°"), size_rel=0.9*size_rel);
   }
 }
 
